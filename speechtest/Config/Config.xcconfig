@@ -1,0 +1,3 @@
+#include? "Local.xcconfig"
+
+// Keep developer-specific signing settings out of source control.
