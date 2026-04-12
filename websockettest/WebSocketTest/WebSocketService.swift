@@ -44,16 +44,6 @@ final class WebSocketService: NSObject, ObservableObject {
         task = nextTask
         nextTask.resume()
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            nextTask.sendPing { error in
-                if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(returning: ())
-                }
-            }
-        }
-
         return url.absoluteString
     }
 
