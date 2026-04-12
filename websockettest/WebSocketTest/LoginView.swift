@@ -3,10 +3,18 @@ import SwiftUI
 struct LoginView: View {
     var onConnected: (WebSocketService, String) -> Void
 
-    @State private var ip = "127.0.0.1"
-    @State private var port = "8024"
+    @State private var ip: String
+    @State private var port: String
     @State private var isConnecting = false
     @State private var errorMessage = ""
+
+    init(onConnected: @escaping (WebSocketService, String) -> Void) {
+        self.onConnected = onConnected
+
+        let defaults = UserDefaults.standard
+        _ip = State(initialValue: defaults.string(forKey: StorageKeys.hostIP) ?? "127.0.0.1")
+        _port = State(initialValue: defaults.string(forKey: StorageKeys.port) ?? "8024")
+    }
 
     var body: some View {
         VStack(spacing: 28) {
@@ -73,7 +81,13 @@ struct LoginView: View {
 
             do {
                 let endpoint = try await service.connect(ip: ip, port: port)
+                let connectedIP = ip.trimmingCharacters(in: .whitespacesAndNewlines)
+                let connectedPort = port.trimmingCharacters(in: .whitespacesAndNewlines)
                 await MainActor.run {
+                    UserDefaults.standard.set(connectedIP, forKey: StorageKeys.hostIP)
+                    UserDefaults.standard.set(connectedPort, forKey: StorageKeys.port)
+                    ip = connectedIP
+                    port = connectedPort
                     isConnecting = false
                     onConnected(service, endpoint)
                 }
@@ -85,6 +99,11 @@ struct LoginView: View {
             }
         }
     }
+}
+
+private enum StorageKeys {
+    static let hostIP = "webSocketTest.hostIP"
+    static let port = "webSocketTest.port"
 }
 
 private struct LabeledTextField: View {
