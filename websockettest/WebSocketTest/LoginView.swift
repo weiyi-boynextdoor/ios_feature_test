@@ -25,7 +25,7 @@ struct LoginView: View {
                 LabeledTextField(title: "IP", placeholder: "127.0.0.1", text: $ip)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .keyboardType(.numbersAndPunctuation)
+                    .keyboardType(.decimalPad)
 
                 LabeledTextField(title: "PORT", placeholder: "8080", text: $port)
                     .keyboardType(.numberPad)
