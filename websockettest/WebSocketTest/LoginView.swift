@@ -4,7 +4,7 @@ struct LoginView: View {
     var onConnected: (WebSocketService, String) -> Void
 
     @State private var ip = "127.0.0.1"
-    @State private var port = "8080"
+    @State private var port = "8024"
     @State private var isConnecting = false
     @State private var errorMessage = ""
 

@@ -27,7 +27,7 @@ final class WebSocketService: NSObject, ObservableObject {
 
         guard !trimmedIP.isEmpty,
               !trimmedPort.isEmpty,
-              var components = URLComponents(string: "ws://\(trimmedIP):\(trimmedPort)")
+              var components = URLComponents(string: "ws://\(trimmedIP):\(trimmedPort)/ws")
         else {
             throw WebSocketError.invalidEndpoint
         }
