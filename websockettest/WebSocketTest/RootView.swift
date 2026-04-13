@@ -14,7 +14,11 @@ struct RootView: View {
             }
             .navigationDestination(isPresented: $isConnected) {
                 if let service {
-                    ChatView(service: service, endpoint: connectedEndpoint)
+                    ChatView(service: service, endpoint: connectedEndpoint) {
+                        self.service = nil
+                        connectedEndpoint = ""
+                        isConnected = false
+                    }
                 }
             }
         }

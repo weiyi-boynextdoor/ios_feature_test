@@ -18,6 +18,7 @@ final class ChatViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
     @Published var draft = ""
     @Published var connectionStatus = "Online"
+    @Published var isDisconnected = false
 
     private let service: WebSocketService
     private var receiveTask: Task<Void, Never>?
@@ -38,8 +39,7 @@ final class ChatViewModel: ObservableObject {
             do {
                 try await service.send(text)
             } catch {
-                messages.append(ChatMessage(sender: .system, text: error.localizedDescription))
-                connectionStatus = "Offline"
+                markDisconnected(message: error.localizedDescription)
             }
         }
     }
@@ -48,7 +48,7 @@ final class ChatViewModel: ObservableObject {
         receiveTask?.cancel()
         receiveTask = nil
         service.disconnect()
-        connectionStatus = "Offline"
+        markDisconnected()
     }
 
     private func startReceiving() {
@@ -63,13 +63,21 @@ final class ChatViewModel: ObservableObject {
                     messages.append(ChatMessage(sender: .bot, text: text))
                 } catch {
                     if !Task.isCancelled {
-                        messages.append(ChatMessage(sender: .system, text: error.localizedDescription))
-                        connectionStatus = "Offline"
+                        markDisconnected(message: error.localizedDescription)
                     }
                     break
                 }
             }
         }
+    }
+
+    private func markDisconnected(message: String? = nil) {
+        if let message {
+            messages.append(ChatMessage(sender: .system, text: message))
+        }
+
+        connectionStatus = "Offline"
+        isDisconnected = true
     }
 }
 
@@ -77,10 +85,12 @@ struct ChatView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: ChatViewModel
     let endpoint: String
+    let onDisconnected: () -> Void
 
-    init(service: WebSocketService, endpoint: String) {
+    init(service: WebSocketService, endpoint: String, onDisconnected: @escaping () -> Void) {
         _viewModel = StateObject(wrappedValue: ChatViewModel(service: service))
         self.endpoint = endpoint
+        self.onDisconnected = onDisconnected
     }
 
     var body: some View {
@@ -115,9 +125,15 @@ struct ChatView: View {
             ToolbarItem(placement: .topBarLeading) {
                 Button("Close") {
                     viewModel.disconnect()
-                    dismiss()
+                    onDisconnected()
                 }
             }
+        }
+        .onChange(of: viewModel.isDisconnected) { _, isDisconnected in
+            guard isDisconnected else { return }
+
+            onDisconnected()
+            dismiss()
         }
     }
 
