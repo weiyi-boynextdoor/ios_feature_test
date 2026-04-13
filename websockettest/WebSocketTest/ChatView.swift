@@ -15,9 +15,7 @@ struct ChatMessage: Identifiable, Equatable {
 
 @MainActor
 final class ChatViewModel: ObservableObject {
-    @Published var messages: [ChatMessage] = [
-        ChatMessage(sender: .system, text: "Connected. Say hello to the chatbot here.")
-    ]
+    @Published var messages: [ChatMessage] = []
     @Published var draft = ""
     @Published var connectionStatus = "Online"
 
@@ -127,12 +125,6 @@ struct ChatView: View {
         VStack(spacing: 4) {
             Text("Chatbot")
                 .font(.headline)
-
-            Text("\(viewModel.connectionStatus) - \(endpoint)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .truncationMode(.middle)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 16)

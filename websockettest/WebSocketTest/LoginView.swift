@@ -20,15 +20,6 @@ struct LoginView: View {
         VStack(spacing: 28) {
             Spacer()
 
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Chat Login")
-                    .font(.largeTitle.bold())
-
-                Text("Connect to your WebSocket chat server.")
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
             VStack(spacing: 16) {
                 LabeledTextField(title: "IP", placeholder: "127.0.0.1", text: $ip)
                     .textInputAutocapitalization(.never)
